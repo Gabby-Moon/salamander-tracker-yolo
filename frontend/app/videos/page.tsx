@@ -2,7 +2,7 @@
 import Image from "next/image"
 import sala1 from "@/public/VideoSala1.jpg"
 import sala2 from "@/public/VideoSala2.jpg"
-import VideoList from "@/components/videolist"
+import VideoList from "@/frontend/components/videolist"
 import {useState, useEffect} from 'react'
 import {fetchVideos} from '@/lib/fetch'
 

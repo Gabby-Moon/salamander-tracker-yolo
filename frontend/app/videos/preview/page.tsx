@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link"
 import Image from "next/image"
-import Results from "@/components/results"
+import Results from "@/frontend/components/results"
 import {useState, useEffect} from 'react'
 import placeholderThumbnailImg from '@/mock/thumbnail/Thumbnail.jpg'
 import binarizedThumbnailImg from '@/mock/thumbnail/Binarized.jpg'
