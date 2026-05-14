@@ -11,21 +11,12 @@ import processImage from "@/lib/binarizer"
 
 export default function Preview() {
     const [videoThumbnail, setVideoThumbnail] = useState(<Image src={placeholderThumbnailImg} alt="video thumbnail" width={320} height={320} />)
+    // Todo: Make binarized Thumbnail to YOLO image
     const [binarizedThumbnail, setBinarizedThumbnail] = useState(<Image src={binarizedThumbnailImg} alt="binarized thumbnail" width={320} height={320} />)
     const [thumbBlob, setThumbBlob] = useState<Blob | null>(null);
-    const [sliderValue, setSliderValue] = useState(50)
-    const [colorValue, setColorValue] = useState('#000000')
 
     const searchParam = useSearchParams()
     const videoParam = searchParam.get('video')
-
-    const handleSliderChange = (event) => {
-        setSliderValue(event.target.value)
-    }
-
-    const handleColorChange = (event) => {
-        setColorValue(event.target.value)
-    }
     
     useEffect(() => {
         //actual fetch
@@ -46,42 +37,25 @@ export default function Preview() {
     }, [videoParam])
 
     useEffect(() => {
-        if (!thumbBlob || !colorValue || !sliderValue) return;
+        if (!thumbBlob) return;
 
         async function loadBinarized() {
-            const binDataUrl = await processImage(thumbBlob, colorValue, sliderValue)
+            const binDataUrl = await processImage(thumbBlob)
             setBinarizedThumbnail(<Image src={binDataUrl} alt="binarized thumbnail" width={320} height={320} unoptimized />)
         }
         loadBinarized()
-    }, [colorValue, sliderValue, thumbBlob])
-
-
-    function toHexColor(color) {
-        return color.replace("#", "")
-    }
+    }, [thumbBlob])
 
     return (
         <div id="preview-page">
             <div id="preview-page-cont">
                 {videoThumbnail}
-                <div className="image-target-select">
-                    <label htmlFor="color-picker">Target Color: 
-                        <input type="color" id="color-picker" defaultValue={colorValue} onChange={handleColorChange}/>
-                    </label>
-                    <p>Color: {colorValue}</p>
-                    <label htmlFor="range-slider">Threshold: 
-                        <input type="range" id="range-slider" min="0" max="455" defaultValue={sliderValue} onChange={handleSliderChange}/>
-                    </label>
-                    <p>Value: {sliderValue}</p>
-                </div>
                 {binarizedThumbnail}
             </div>
             
             <div className="preview-controls">
                 <Results 
-                    video={videoParam}
-                    targetColor={toHexColor(colorValue)}
-                    threshold={sliderValue}
+                    
                 />
             </div>
         </div>

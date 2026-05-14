@@ -4,7 +4,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { processVideo, getJobStatus } from "@/lib/fetch"
 
-export default function Results({ threshold, targetColor, video }) {
+// Todo: Make so it processes with YOLO
+
+export default function Results({ video }) {
     const [processing, setProcessing] = useState(false)
     const [urls, setUrls] = useState<string[]>([])
     const [status, setStatus] = useState<string | null>(null)
@@ -17,10 +19,10 @@ export default function Results({ threshold, targetColor, video }) {
         if (processing) return
 
         setProcessing(true)
-        setStatus(`Processing video ${video}, target color ${targetColor}, threshold ${threshold}`)
+        setStatus(`Processing video ${video}`)
 
         try {
-            const job = await processVideo(video, targetColor, threshold)
+            const job = await processVideo(video)
             const jobId = job.jobId || job.error
 
             setStatus(`Job in process with id: ${jobId}`)
