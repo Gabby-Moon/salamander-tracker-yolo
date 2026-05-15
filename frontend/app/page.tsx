@@ -1,23 +1,8 @@
 // import Link from 'next/link'
 // import { testFetch } from '../lib/fetch.js';
-import { useEffect, useState } from 'react';
+import VideoHandler from "../components/VideoHandler";
 
 export default async function Home() {
-  const [pickedFile, setPickedFile] = useState<string | null>(null);
-  const [response, setResponse] = useState<string | null>(null);
-
-  function upload() {
-    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-      setPickedFile(file.name);
-
-      const formData = new FormData();
-      formData.append('file', file);
-    }
-
-
-  }
 
   return (
 
@@ -25,7 +10,7 @@ export default async function Home() {
     <div className="launch-center">
       <main className="launch-card">
           <h1>Salamander Project</h1>
-
+          <VideoHandler/>
       </main>
     </div>
 
