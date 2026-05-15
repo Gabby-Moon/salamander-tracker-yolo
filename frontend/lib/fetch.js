@@ -1,5 +1,16 @@
 const serverURL = 'http://localhost:3000'
 
+export async function testFetch() { 
+  try { 
+    const response = await fetch('http://localhost:8000/');
+    return await response.json();
+  } catch (err) {
+    console.error('Error in testFetch:', err);
+    return { error: "Failed to fetch" }; // fallback so it doesn't crash
+  }
+}
+
+
 export async function fetchVideos() {
   try {
     const res = await fetch(`${serverURL}/api/videos`); // full API URL
