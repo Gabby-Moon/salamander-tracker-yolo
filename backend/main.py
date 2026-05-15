@@ -1,45 +1,19 @@
-from fastapi import FastAPI, UploadFile, File
-from fastapi.responses import FileResponse
-from ultralytics import YOLO
-import cv2
-import tempfile
-import os
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-app = FastAPI()
+app = FastAPI(title="Salamander Tracker POC")
 
-model = YOLO("best.pt")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.post("/annotate-video")
-async def annotate_video(file: UploadFile = File(...)):
-    input_temp = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
-    input_temp.write(await file.read())
-    input_temp.close()
+@app.get("/")
+def root():
+    return {"ok": True}
 
-    output_path = input_temp.name.replace(".mp4", "_annotated.mp4")
-
-    cap = cv2.VideoCapture(input_temp.name)
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-    writer = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-
-        results = model(frame)[0]
-        annotated = results.plot()
-        writer.write(annotated)
-    
-    cap.release()
-    writer.release()
-    os.remove(input_temp.name)
-
-    return FileResponse(
-        output_path,
-        media_type="video/mp4",
-        filename="annotated_video.mp4"
-    )
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)
