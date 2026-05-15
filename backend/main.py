@@ -17,6 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/videos", StaticFiles(directory=str(VIDEOS_DIR)), name="videos")
+
 @app.get("/")
 def root():
     return {"ok": True}
