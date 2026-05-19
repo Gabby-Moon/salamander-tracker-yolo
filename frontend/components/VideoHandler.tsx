@@ -5,14 +5,20 @@ import { JSX, useEffect, useState } from 'react';
 export default function VideoHandler() {
     const [pickedFile, setPickedFile] = useState<File | null>(null);
     const [response, setResponse] = useState<Response | null>(null);
-    const [preRender, setPreRender] = useState<JSON | null>(null)
+    const [videoLink, setVideoLink] = useState<string | null>(null);
 
-    useEffect(async () => {
-        if(response != null || response != undefined) {
-            setPreRender(await response.json())
-        }
-        
-    }, [response])
+    useEffect(() => {
+        const handleResponse = async () => {
+            if (response != null) {
+                const data = await response.json();
+                const backendUrl = "http://localhost:8000";
+                const videoPath = data.video_url
+                const fullUrl = videoPath.startsWith("http") ? videoPath : `${backendUrl}${videoPath}`;
+                setVideoLink(fullUrl);
+            }
+        };
+        handleResponse();
+    }, [response]);
 
     async function upload() {
         if (pickedFile == null || pickedFile == undefined) {
@@ -39,8 +45,7 @@ export default function VideoHandler() {
                 </input>
                 <button type="button" onClick={upload}>Upload</button>
             </form>
-            {/* <video src={response.}></video> */}
-            <pre>{JSON.stringify(response)}</pre>
+            {videoLink && <video src={videoLink} controls width="400"></video>}
         </div>
         )
 }
