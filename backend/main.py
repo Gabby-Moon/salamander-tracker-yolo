@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 """
 Simple FastAPI backend for a salamander tracking YOLO model.
 
@@ -32,27 +33,8 @@ temp_output = VIDEOS_DIR / "output_tmp.mp4"
 model = YOLO("best.pt")
 print(model.names)
 
-app = FastAPI(title="Salamander Tracker POC")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-app.mount("/videos", StaticFiles(directory=str(VIDEOS_DIR)), name="videos")
-job = {"status": "idle"}
-
-@app.get("/")
-def root():
-    """ 
-    A simple root endpoint that returns a JSON response indicating that the server is running.
-    This can be used for health checks or to verify that the server is up and running.
-    """
-    return {"ok": True}
-
 def run_track_job():
+    """Run the tracking job in a separate thread to avoid blocking the main server thread."""
     input_path = VIDEOS_DIR / "input.mp4"
     cap = cv2.VideoCapture(str(input_path))
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -62,7 +44,6 @@ def run_track_job():
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     total = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     print(f"fps={fps} dims={width}x{height} frames={total}")
-    output_path = VIDEOS_DIR / "output.mp4"
     writer = cv2.VideoWriter(
         str(temp_output),
         cv2.VideoWriter_fourcc(*"avc1"),
@@ -110,6 +91,26 @@ def run_track_job():
         "tracks": tracks,
     }
 
+app = FastAPI(title="Salamander Tracker POC")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/videos", StaticFiles(directory=str(VIDEOS_DIR)), name="videos")
+job = {"status": "idle"}
+
+@app.get("/")
+def root():
+    """ 
+    A simple root endpoint that returns a JSON response indicating that the server is running.
+    This can be used for health checks or to verify that the server is up and running.
+    """
+    return {"ok": True}
+
 @app.post("/track")
 def start_track(video: UploadFile = File(...)):
     """Endpoint to receive a video file, save it, and return a URL."""
@@ -117,13 +118,14 @@ def start_track(video: UploadFile = File(...)):
     job.clear()
     job["status"] = "processing"
     job["percent"] = 0
-    run_track_job()
+    Thread(target=run_track_job, daemon=True).start()
     return {
         "status": "processing",
     }
 
 @app.get("/track")
 def get_track():
+    """Endpoint to check the status of the tracking job and retrieve results when done."""
     return job
 
 if __name__ == "__main__":
