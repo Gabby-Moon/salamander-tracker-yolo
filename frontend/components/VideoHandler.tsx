@@ -2,17 +2,27 @@
 
 import { useState } from 'react';
 
+type Track = {
+    track_id: number | string
+    time_on_screen: number
+    label: string
+}
+
 export default function VideoHandler() {
     const [pickedFile, setPickedFile] = useState<File | null>(null);
     const [videoLink, setVideoLink] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [tracks, setTracks] = useState<any[]>([]);
+    const [tracks, setTracks] = useState<Track[]>([]);
+    const [percent, setPercent] = useState<number>(0);
+    const [error, setError] = useState<string | null>(null);
 
     async function upload() {
         if (!pickedFile) return;
 
         setIsLoading(true);
         setVideoLink(null);
+        setError(null);
+        setPercent(0);
 
         const form = new FormData();
         form.append("video", pickedFile);
@@ -27,24 +37,32 @@ export default function VideoHandler() {
                 throw new Error(`Request failed: ${res.status}`);
             }
 
-            const data = await res.json();
+            const pollInterval = setInterval(async () => {
+                const statusRes = await fetch("http://localhost:8000/track");
+                const job = await statusRes.json();
 
-            const backendUrl = "http://localhost:8000";
-            const videoPath = data.video_url;
-            const tracksData = data.tracks || [];
+                if (job.percent !== undefined) {
+                    setPercent(job.percent);
+                }
 
-            const fullUrl = videoPath.startsWith("http")
-                ? videoPath
-                : `${backendUrl}${videoPath}`;
+                if (job.status === "done") {
+                    clearInterval(pollInterval);
+                    setIsLoading(false);
 
+                    setVideoLink(job.result.video_url);
+                    setTracks(job.result.tracks || []);
 
-            setVideoLink(fullUrl);
-            setTracks(tracksData);
+                    setPercent(100);
+                }
 
+                if (job.status === "error") {
+                    clearInterval(pollInterval);
+                    setIsLoading(false);
+                    setError(job.message || "An error occurred during processing.");
+                }
+            }, 1500);
         } catch (err) {
             console.error(err);
-        } finally {
-            setIsLoading(false);
         }
     }
 
@@ -75,22 +93,37 @@ export default function VideoHandler() {
             </form>
 
             <div style={{ marginTop: "20px" }}>
-                {isLoading && (
+                {(isLoading || error) && (
                     <div
                         style={{
                             width: "400px",
                             height: "225px",
                             border: "1px solid #ccc",
                             display: "flex",
+                            flexDirection: "column",
                             alignItems: "center",
                             justifyContent: "center",
+                            gap: "10px",
                         }}
                     >
-                        Loading tracked video...
+                        {error ? (
+                            <div style={{ color: "red", textAlign: "center", padding: "20px" }}>
+                                <strong>Error:</strong>
+                                <br />
+                                {error}
+                            </div>
+                        ) : (
+                            <>
+                                Loading tracked video...
+                                {percent !== undefined && (
+                                    <progress value={percent} max={100} />
+                                )}
+                            </>
+                        )}
                     </div>
                 )}
 
-                {!isLoading && videoLink && (
+                {!isLoading && !error && videoLink && (
                     <div>
                         <video src={videoLink} controls width="400" />
 
