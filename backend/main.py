@@ -53,21 +53,43 @@ def run_track_job():
 
     frames_seen = defaultdict(int)
     label_for = {}
+    paths = defaultdict(list)
 
     for frame_idx in range(total):
         ok, frame = cap.read()
         if not ok:
             break
         result = model.track(frame, persist=True, verbose=False)[0]
-        writer.write(result.plot())
+        annotated = result.plot()
+
         boxes = result.boxes
         if boxes is not None and boxes.id is not None:
-            for tid, cls_id in zip(boxes.id.tolist(), boxes.cls.tolist()):
+            ids = boxes.id.tolist()
+            classes = boxes.cls.tolist()
+            xyxy = boxes.xyxy.tolist()
+
+            for tid, cls_id, box in zip(ids, classes, xyxy):
+                tid = int(tid)
+
                 frames_seen[int(tid)] += 1
                 label_for[int(tid)] = model.names[int(cls_id)]
-        if frame_idx % 30 == 0:
-            print(f"frame {frame_idx}/{total}")
-            job["percent"] = int((frame_idx + 1) / total * 100)
+
+                x1, y1, x2, y2 = box
+                cx = int((x1 + x2) / 2)
+                cy = int((y1 + y2) / 2)
+
+                paths[tid].append((cx, cy))
+
+                pts = paths[tid]
+                if len(pts) > 1:
+                    for i in range(1, len(pts)):
+                        cv2.line(annotated, pts[i-1], pts[i], (0, 255, 0), 2)
+
+            writer.write(annotated)
+
+            if frame_idx % 30 == 0:
+                print(f"frame {frame_idx}/{total}")
+                job["percent"] = int((frame_idx + 1) / total * 100)
 
     cap.release()
     writer.release()
