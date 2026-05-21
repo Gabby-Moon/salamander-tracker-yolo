@@ -119,15 +119,15 @@ export default function VideoHandler() {
                                 {tracks.map((t, idx) => (
                                     <tr key={idx}>
                                         <td style={{ border: "1px solid #ccc", padding: "6px" }}>
-                                            {t.id}
+                                            {t.track_id}
                                         </td>
                                         <td style={{ border: "1px solid #ccc", padding: "6px" }}>
                                             {t.label}
                                         </td>
                                         <td style={{ border: "1px solid #ccc", padding: "6px" }}>
-                                            {typeof t.time === "number"
-                                                ? `${t.time.toFixed(2)}s`
-                                                : t.time}
+                                            {typeof t.time_on_screen === "number"
+                                                ? `${t.time_on_screen.toFixed(2)}s`
+                                                : t.time_on_screen}
                                         </td>
                                     </tr>
                                 ))}
