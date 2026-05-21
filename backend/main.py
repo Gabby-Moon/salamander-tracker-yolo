@@ -12,6 +12,7 @@ static files are served from the "videos" directory.
 import os
 import time
 from pathlib import Path
+from threading import Thread
 
 from fastapi import FastAPI, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
@@ -41,6 +42,7 @@ app.add_middleware(
 )
 
 app.mount("/videos", StaticFiles(directory=str(VIDEOS_DIR)), name="videos")
+job = {"status": "idle"}
 
 @app.get("/")
 def root():
@@ -50,10 +52,7 @@ def root():
     """
     return {"ok": True}
 
-@app.post("/track")
-def start_track(video: UploadFile = File(...)):
-    """Endpoint to receive a video file, save it, and return a URL."""
-    (VIDEOS_DIR / "input.mp4").write_bytes(video.file.read())
+def run_track_job():
     input_path = VIDEOS_DIR / "input.mp4"
     cap = cv2.VideoCapture(str(input_path))
     fps = cap.get(cv2.CAP_PROP_FPS)
@@ -87,6 +86,7 @@ def start_track(video: UploadFile = File(...)):
                 label_for[int(tid)] = model.names[int(cls_id)]
         if frame_idx % 30 == 0:
             print(f"frame {frame_idx}/{total}")
+            # job["percent"] = int((frame_idx + 1) / total * 100)
 
     cap.release()
     writer.release()
@@ -102,10 +102,13 @@ def start_track(video: UploadFile = File(...)):
         for tid, count in frames_seen.items()
     ]
 
+@app.post("/track")
+def start_track(video: UploadFile = File(...)):
+    """Endpoint to receive a video file, save it, and return a URL."""
+    (VIDEOS_DIR / "input.mp4").write_bytes(video.file.read())
+    run_track_job()
     return {
         "status": "done",
-        "video_url": f"http://localhost:8000/videos/output.mp4?t={int(time.time())}",
-        "tracks": tracks,
     }
 
 if __name__ == "__main__":
