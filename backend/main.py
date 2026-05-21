@@ -86,7 +86,7 @@ def run_track_job():
                 label_for[int(tid)] = model.names[int(cls_id)]
         if frame_idx % 30 == 0:
             print(f"frame {frame_idx}/{total}")
-            # job["percent"] = int((frame_idx + 1) / total * 100)
+            job["percent"] = int((frame_idx + 1) / total * 100)
 
     cap.release()
     writer.release()
@@ -102,14 +102,29 @@ def run_track_job():
         for tid, count in frames_seen.items()
     ]
 
+    job.clear()
+    job["status"] = "done"
+    job["percent"] = 100
+    job["result"] = {
+        "video_url": f"http://localhost:8000/videos/output.mp4?t={int(time.time())}",
+        "tracks": tracks,
+    }
+
 @app.post("/track")
 def start_track(video: UploadFile = File(...)):
     """Endpoint to receive a video file, save it, and return a URL."""
     (VIDEOS_DIR / "input.mp4").write_bytes(video.file.read())
+    job.clear()
+    job["status"] = "processing"
+    job["percent"] = 0
     run_track_job()
     return {
-        "status": "done",
+        "status": "processing",
     }
+
+@app.get("/track")
+def get_track():
+    return job
 
 if __name__ == "__main__":
     import uvicorn
