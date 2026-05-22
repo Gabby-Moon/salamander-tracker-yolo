@@ -124,7 +124,7 @@ export default function VideoHandler() {
                 )}
 
                 {!isLoading && !error && videoLink && (
-                    <div>
+                    <div id='info'>
                         <video src={videoLink} controls width="400" />
 
                         <table
