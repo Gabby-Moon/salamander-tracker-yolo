@@ -16,6 +16,9 @@ After that is done, in the same environment run ```python main.py```, this will 
 In the other terminal, run ```cd frontend``` to move to the frontend folder and run ```npm i``` to install the modules needed for the page to work. After, you should be able to run ```npm run dev``` and it will give you a localhost link to follow. Going to the link will take you to the page.
 
 # Dataset & Training
+A total of 240 images were labeled for this project. The dataset was compiled from two sources: frames extracted from the original salamander video, and additional salamander images sourced from the internet to improve diversity and generalization. All images were annotated using Label Studio.
+
+The labeled dataset was then used to train a YOLO object detection model. Annotations were exported from Label Studio in YOLO-compatible format and used to tune the model to detect salamanders in video frames.
 
 # Questions
 ## Comparison
