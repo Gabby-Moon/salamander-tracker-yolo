@@ -25,3 +25,4 @@ The labeled dataset was then used to train a YOLO object detection model. Annota
 For color masking the salamander would need to have a different color compared to the background, like a dark gray salamander on a green background. For Yolo detection it works better because it will know what a salamander looks like and will be able to tell it apart from a background of a similar color, based on features of the salamander. In a video with a dark red salamander and a red background, the Yolo model does better at detecting it if the contrast is too similar for the color masking to detect. The Yolo model will still detect it because of pattern recognition and the images it's trained from.
 
 ## More Time
+We would add a way to differentiate the file names so that the video wasn't constantly overwriting itself. Maybe smoothing out the path made for the outputted video, when the camera moves. We could've rendered a separate video for a heat map and a toggle for it.
