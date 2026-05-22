@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+input {
+  border-style: ridge;
+  border-color: #794e0a;
+  border-width: 2px;
+  border-radius: 2px;
+  background-color: #fab84d84;
+  margin: 4px;
+  padding: 4px;
+  
+}
+
+#info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  /* previous version
+  background-image: url("../public/HomeSala.jpg");
+  background-size: cover;
+  */
+}
+
+div.launch-center{
+  /*
+  Make image only on main page
+  */
+  background-image: url("../public/HomeSala.jpg");
+  background-size: cover;
+  display: flex;
+}
+
+.launch-card {
+  background-color: #ffebd630;
+  justify-content: center;
+  padding: 10px;
+}
+
+/*
+*/
+button {
+  background-color:#fab74d;
+  color:#ffffff;
+  border-color: #794e0a;
+  border-width: 4px;
+  border-style: ridge;
+  padding-left: 20%;
+  padding-right: 20%;
+  display: block;
+  margin: auto;
+}
+
+.job-list, .preview-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-controls {
+  align-items: stretch;
+  text-align: center;
+}
+
+.pop-text, .preview-link, h1 {
+  font-weight: bold;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+/*
+*/
+button:hover {
+  background-color: #538eeb;
+}
+
+a {
+  color:#ffe8c4;
+}
+a:hover {
+  color:#fab74d;
+}
+
+#video-page {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+#SalaList {
+  padding: 80px;
+  justify-content: center;
+}
+
+li {
+  list-style-type: circle;
+}
+
+#preview-page-cont {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding: 30px;
+}
+
+.image-target-select {
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background-color: #794e0a;
+  color: #ffebd6;
+}
+
+/* home css */
+.launch-center {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.launch-card { text-align: center; max-width: 720px; width: 100%; }
+
+.launch-card h1 { margin: 0 0 0.5rem; font-size: 1.8rem; }
+
+.launch-link {
+  display: inline-block;
+  margin-top: 0.9rem;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background-color: #794f0a39;
+  color: #794e0a;
+  text-decoration: none;
+  border: 1px solid #794f0a39;
+}
+
+/* minimal horizontal top nav */
+.top-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0.5rem 1rem;
+}
+.top-nav a {
+  text-decoration: none;
+  color: inherit;
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+}
+.top-nav a:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* preview thumbnails: fixed square boxes, keep image contained (no stretch) */
+#preview-page .preview-thumb {
+  width: 320px;
+  height: 320px;
+  object-fit: contain;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #000;
+  display: block;
+}
+
+/* keep the middle controls vertically centered between the two boxes */
+.image-target-select {
+  align-self: center;
+  margin: 0 1rem;
+}
