@@ -15,6 +15,8 @@ After that is done, in the same environment run ```python main.py```, this will 
 
 In the other terminal, run ```cd frontend``` to move to the frontend folder and run ```npm i``` to install the modules needed for the page to work. After, you should be able to run ```npm run dev``` and it will give you a localhost link to follow. Going to the link will take you to the page.
 
+There is a test video within the root folder to test or if you can't find a video.
+
 # Dataset & Training
 A total of 240 images were labeled for this project. The dataset was compiled from two sources: frames extracted from the original salamander video, and additional salamander images sourced from the internet to improve diversity and generalization. All images were annotated using Label Studio.
 
